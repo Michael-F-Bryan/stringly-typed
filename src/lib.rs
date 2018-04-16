@@ -10,7 +10,7 @@ pub trait StringlyTyped {
     where K: IntoIterator<Item = S>,
           S: AsRef<str>;
 
-    fn get<K, S>(&self, keys: K) -> Result<(), UpdateError>
+    fn get<K, S>(&self, keys: K) -> Result<Value, UpdateError>
     where K: IntoIterator<Item = S>,
           S: AsRef<str>;
 
@@ -35,6 +35,18 @@ impl Value {
             Value::Integer(_) => INTEGER_TYPE,
             Value::Double(_) => DOUBLE_TYPE,
         }
+    }
+}
+
+impl From<i64> for Value {
+    fn from(other: i64) -> Value {
+        Value::Integer(other)
+    }
+}
+
+impl From<f64> for Value {
+    fn from(other: f64) -> Value {
+        Value::Double(other)
     }
 }
 
@@ -67,11 +79,18 @@ macro_rules! impl_primitive_type {
                 }
             }
 
-            fn get<K, S>(&self, keys: K) -> Result<(), UpdateError>
+            fn get<K, S>(&self, keys: K) -> Result<Value, UpdateError>
             where K: IntoIterator<Item = S>,
                 S: AsRef<str>,
             {
-                unimplemented!()
+                let mut keys = keys.into_iter();
+                
+                if let Some(_) = keys.next() {
+                    let elements_remaning = keys.count() + 1;
+                    return Err(UpdateError::TooManyKeys { elements_remaning });
+                }
+
+                Ok(self.clone().into())
             }
 
             fn data_type(&self) -> &'static str {
@@ -100,6 +119,19 @@ mod tests {
         let mut float: f64 = 3.14;
         float.set(empty.clone(), Value::Double(42.0)).unwrap();
         assert_eq!(float, 42.0);
+    }
+
+    #[test]
+    fn get_some_primitives() {
+        let empty = iter::empty::<&str>();
+
+        let integer: i64 = 42;
+        let got = integer.get(empty.clone()).unwrap();
+        assert_eq!(got, Value::from(integer));
+
+        let float: f64 = 3.14;
+        let got = float.get(empty.clone()).unwrap();
+        assert_eq!(got, Value::from(float));
     }
 
     #[test]
