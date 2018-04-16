@@ -11,17 +11,19 @@ extern crate synstructure;
 #[macro_use]
 extern crate quote;
 
-use syn::{Ident, DeriveInput};
+use syn::Ident;
 use quote::Tokens;
 use synstructure::Structure;
 
 decl_derive!([StringlyTyped] => stringly_typed);
 
-const INVALID_FIELD_ERROR: &'static str = "StringlyTyped can only be derived on normal struct fields";
+const INVALID_FIELD_ERROR: &'static str = "StringlyTyped can only be derived on structs with fields that have identifiers";
 
 fn stringly_typed(s: Structure) -> quote::Tokens {
     let name = &s.ast().ident;
     let name_as_str = name.to_string();
+
+    assert_eq!(s.variants().len(), 1, "Multiple synstructure variants aren't supported (yet)");
 
     let field_names: Vec<Ident> = s.variants()[0].bindings().into_iter().map(|field| {
         field.ast().ident.expect(INVALID_FIELD_ERROR).clone()
@@ -30,19 +32,19 @@ fn stringly_typed(s: Structure) -> quote::Tokens {
 
     let set_body = field_names.iter().map(|name| {
         let name_as_str = name.to_string();
-        quote!(#name_as_str => self.#name.set(keys, value),)
+        quote!(#name_as_str => self.#name.set_value(keys, value),)
     })
     .fold(Tokens::new(), |mut acc, elem| {acc.append_all(elem); acc});
 
     let get_body = field_names.iter().map(|name| {
         let name_as_str = name.to_string();
-        quote!(#name_as_str => self.#name.get(keys),)
+        quote!(#name_as_str => self.#name.get_value(keys),)
     })
     .fold(Tokens::new(), |mut acc, elem| {acc.append_all(elem); acc});
 
     let field_names2 = field_names.clone();
     let impl_set = quote! {
-        fn set<K, S>(&mut self, keys: K, value: ::stringly_typed::Value) -> Result<(), ::stringly_typed::UpdateError>
+        fn set_value<K, S>(&mut self, keys: K, value: ::stringly_typed::Value) -> Result<(), ::stringly_typed::UpdateError>
         where K: IntoIterator<Item = S>,
             S: AsRef<str> 
         {
@@ -63,7 +65,7 @@ fn stringly_typed(s: Structure) -> quote::Tokens {
     };
     
     let impl_get = quote! {
-        fn get<K, S>(&self, keys: K) -> Result<::stringly_typed::Value, ::stringly_typed::UpdateError>
+        fn get_value<K, S>(&self, keys: K) -> Result<::stringly_typed::Value, ::stringly_typed::UpdateError>
         where K: IntoIterator<Item = S>,
             S: AsRef<str> 
         {
