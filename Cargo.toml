@@ -8,3 +8,9 @@ authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
 [features]
 default = ["std"]
 std = []
+
+[dev-dependencies]
+stringly-typed-derive = { path = "./stringly-typed-derive" }
+
+[workspace]
+members = ["stringly-typed-derive"]

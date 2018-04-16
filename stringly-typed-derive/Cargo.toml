@@ -2,6 +2,7 @@
 name = "stringly-typed-derive"
 version = "0.1.0"
 authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
+workspace = ".."
 
 [lib]
 proc-macro = true
@@ -9,3 +10,4 @@ proc-macro = true
 [dependencies]
 syn = "0.13.1"
 quote = "0.5.1"
+synstructure = "0.8.1"

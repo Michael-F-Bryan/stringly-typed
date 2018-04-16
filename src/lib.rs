@@ -1,4 +1,42 @@
-//! A crate for updating values and indexing into structs by using ...
+//! A crate for updating values and indexing into Rust types at runtime.
+//! 
+//! # Examples
+//! 
+//! ```rust
+//! # extern crate stringly_typed;
+//! # #[macro_use]
+//! # extern crate stringly_typed_derive;
+//! use stringly_typed::{StringlyTyped, Value};
+//! 
+//! #[derive(StringlyTyped)]
+//! struct Outer {
+//!   inner: Inner,
+//! }
+//! 
+//! #[derive(StringlyTyped)]
+//! struct Inner {
+//!   x: f64,
+//!   y: i64,
+//! }
+//! 
+//! # fn run() -> Result<(), ::stringly_typed::UpdateError> {
+//! let mut thing = Outer {
+//!   inner: Inner {
+//!     x: 3.14,
+//!     y: 42,
+//!   }
+//! };
+//! 
+//! let key = "inner.y";
+//! let value = -7;
+//! thing.set(key.split("."), Value::from(value))?;
+//! 
+//! let got = thing.get(key.split("."))?;
+//! assert_eq!(thing.inner.y, -7);
+//! # Ok(())
+//! # }
+//! # fn main() { run().unwrap() }
+//! ```
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
@@ -28,6 +66,8 @@ pub trait StringlyTyped {
 pub enum UpdateError {
     TypeError { found: &'static str, expected: &'static str },
     TooManyKeys { elements_remaning: usize },
+    UnknownField { valid_fields: &'static [&'static str] },
+    NotEnoughKeys,
 }
 
 /// A dynamically typed value.
