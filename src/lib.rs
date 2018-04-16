@@ -1,10 +1,17 @@
 //! A crate for updating values and indexing into structs by using ...
 
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(not(feature = "std"))]
+mod std {
+    pub use ::core::iter;
+}
 
 pub const DOUBLE_TYPE: &'static str = "double";
 pub const INTEGER_TYPE: &'static str = "integer";
+pub const STRING_TYPE: &'static str = "string";
 
+/// The whole point.
 pub trait StringlyTyped {
     fn set<K, S>(&mut self, keys: K, value: Value) -> Result<(), UpdateError>
     where K: IntoIterator<Item = S>,
@@ -23,10 +30,17 @@ pub enum UpdateError {
     TooManyKeys { elements_remaning: usize },
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+/// A dynamically typed value.
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(not(feature = "std"), derive(Copy))] 
 pub enum Value {
     Integer(i64),
     Double(f64),
+    // FIXME: Not sure if this is a good idea...
+    #[cfg(feature = "std")]
+    String(String),
+    #[doc(hidden)]
+    __NonExhaustive,
 }
 
 impl Value {
@@ -34,6 +48,9 @@ impl Value {
         match *self {
             Value::Integer(_) => INTEGER_TYPE,
             Value::Double(_) => DOUBLE_TYPE,
+            #[cfg(feature = "std")]
+            Value::String(_) => STRING_TYPE,
+            Value::__NonExhaustive => unreachable!(),
         }
     }
 }
@@ -50,8 +67,26 @@ impl From<f64> for Value {
     }
 }
 
+#[cfg(feature = "std")]
+impl From<String> for Value {
+    fn from(other: String) -> Value {
+        Value::String(other)
+    }
+}
+
+#[cfg(feature = "std")]
+impl<'a> From<&'a str> for Value {
+    fn from(other: &'a str) -> Value {
+        Value::String(other.to_string())
+    }
+}
+
 macro_rules! impl_primitive_type {
     ($type:ty, $variant:ident, $data_type:expr) => {
+        impl_primitive_type!(; $type, $variant, $data_type);
+    };
+    ($(#[$attr:meta])*; $type:ty, $variant:ident, $data_type:expr) => {
+        $(#[$attr])*
         impl StringlyTyped for $type {
             fn set<K, S>(&mut self, keys: K, value: Value) -> Result<(), UpdateError>
             where K: IntoIterator<Item = S>,
@@ -102,11 +137,12 @@ macro_rules! impl_primitive_type {
 
 impl_primitive_type!(i64, Integer, INTEGER_TYPE);
 impl_primitive_type!(f64, Double, DOUBLE_TYPE);
+impl_primitive_type!(String, String, STRING_TYPE);
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use core::iter;
+    use std::iter;
 
     #[test]
     fn update_some_primitives() {
@@ -121,6 +157,17 @@ mod tests {
         assert_eq!(float, 42.0);
     }
 
+    #[cfg(feature = "std")]
+    #[test]
+    fn update_a_string() {
+        let empty = iter::empty::<&str>();
+
+        let mut string = String::from("before");
+        let new_value = String::from("after");
+        string.set(empty.clone(), new_value.clone().into()).unwrap();
+        assert_eq!(string, new_value);
+    }
+
     #[test]
     fn get_some_primitives() {
         let empty = iter::empty::<&str>();
@@ -132,6 +179,16 @@ mod tests {
         let float: f64 = 3.14;
         let got = float.get(empty.clone()).unwrap();
         assert_eq!(got, Value::from(float));
+    }
+
+    #[cfg(feature = "std")]
+    #[test]
+    fn get_a_string() {
+        let empty = iter::empty::<&str>();
+
+        let string = String::from("before");
+        let got = string.get(empty.clone()).unwrap();
+        assert_eq!(got, Value::from(string));
     }
 
     #[test]
