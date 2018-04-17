@@ -1,17 +1,17 @@
 [package]
-name = "stringly-typed"
+name = "stringly_typed"
 version = "0.1.0"
 authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
 
 [dependencies]
-stringly-typed-derive = { path = "./stringly-typed-derive" }
+stringly_typed_derive = { path = "./stringly_typed_derive" }
 
 [features]
 default = ["std"]
 std = []
 
 [workspace]
-members = ["stringly-typed-derive"]
+members = ["stringly_typed_derive"]
 
 [dev-dependencies]
 serde = "1.0.38"

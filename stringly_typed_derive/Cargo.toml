@@ -1,5 +1,5 @@
 [package]
-name = "stringly-typed-derive"
+name = "stringly_typed_derive"
 version = "0.1.0"
 authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
 workspace = ".."
