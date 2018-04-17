@@ -4,8 +4,9 @@ rust:
 cache: cargo
 
 matrix:
-  - env: FEATURES=--no-default-features
-  - env: FEATURES=
+  include:
+    - env: FEATURES=--no-default-features
+    - env: FEATURES=
 
 script:
   - cargo build --all --verbose $FEATURES
