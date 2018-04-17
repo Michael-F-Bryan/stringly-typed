@@ -1,5 +1,7 @@
 # Stringly-Typed Rust
 
+[![Build Status](https://travis-ci.org/Michael-F-Bryan/stringly-typed.svg?branch=master)](https://travis-ci.org/Michael-F-Bryan/stringly-typed)
+
 A crate for updating values using a stringly-typed API.
 
 ## Typical Use Case

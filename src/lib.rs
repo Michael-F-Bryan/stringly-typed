@@ -59,7 +59,7 @@ pub const STRING_TYPE: &'static str = "string";
 
 /// The whole point.
 pub trait StringlyTyped {
-    fn get(&mut self, key: &str) -> Result<Value, UpdateError> {
+    fn get(&self, key: &str) -> Result<Value, UpdateError> {
         self.get_value(key.split("."))
     }
 
@@ -92,7 +92,7 @@ pub enum UpdateError {
     UnknownField {
         valid_fields: &'static [&'static str],
     },
-    NotEnoughKeys,
+    CantSerialize { data_type: &'static str },
 }
 
 /// A dynamically typed value.

@@ -23,7 +23,7 @@ fn stringly_typed(s: Structure) -> quote::Tokens {
     let name = &s.ast().ident;
     let name_as_str = name.to_string();
 
-    assert_eq!(s.variants().len(), 1, "Multiple synstructure variants aren't supported (yet)");
+    assert_eq!(s.variants().len(), 1, "Enums aren't supported (yet)");
 
     let field_names: Vec<Ident> = s.variants()[0].bindings().into_iter().map(|field| {
         field.ast().ident.expect(INVALID_FIELD_ERROR).clone()
@@ -51,7 +51,7 @@ fn stringly_typed(s: Structure) -> quote::Tokens {
             let mut keys = keys.into_iter();
 
             let element = keys.next()
-                .ok_or_else(|| ::stringly_typed::UpdateError::NotEnoughKeys)?;
+                .ok_or_else(|| ::stringly_typed::UpdateError::CantSerialize { data_type: self.data_type() })?;
 
             match element.as_ref() {
                 #set_body
@@ -72,7 +72,7 @@ fn stringly_typed(s: Structure) -> quote::Tokens {
             let mut keys = keys.into_iter();
 
             let element = keys.next()
-                .ok_or_else(|| ::stringly_typed::UpdateError::NotEnoughKeys)?;
+                .ok_or_else(|| ::stringly_typed::UpdateError::CantSerialize { data_type: self.data_type() })?;
 
             match element.as_ref() {
                 #get_body
