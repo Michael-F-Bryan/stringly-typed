@@ -1,6 +1,8 @@
 # Stringly-Typed Rust
 
 [![Build Status](https://travis-ci.org/Michael-F-Bryan/stringly-typed.svg?branch=master)](https://travis-ci.org/Michael-F-Bryan/stringly-typed)
+[![Crates.io](https://img.shields.io/badge/crates.io-v0.1.0-orange.svg?longCache=true)](https://crates.io/crates/stringly_typed)
+[![docs.rs](https://docs.rs/stringly_typed/badge.svg)](https://docs.rs/stringly_typed)
 
 A crate for updating values using a stringly-typed API.
 
