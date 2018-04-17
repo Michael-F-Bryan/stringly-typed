@@ -1,0 +1,12 @@
+language: rust
+rust:
+  - stable
+cache: cargo
+
+matrix:
+  - env: FEATURES=--no-default-features
+  - env: FEATURES=
+
+script:
+  - cargo build --all --verbose $FEATURES
+  - cargo test --all --verbose $FEATURES
