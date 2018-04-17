@@ -28,7 +28,33 @@ TODO: Mention how serialize-deserialize is expensive
 
 TODO: Mention this is essentially automating the massive switch-case statement
 
-TODO: Add an example
+```rust
+#[macro_use]
+extern crate stringly_typed;
+use stringly_typed::{StringlyTyped, Value};
+
+#[derive(StringlyTyped)]
+struct Config {
+  motion_parameters: MotionParameters,
+  target_bed_temp: f64,
+  version: String,
+  ...
+}
+
+#[derive(StringlyTyped)]
+struct MotionParameters {
+  max_translation_velocity: f64,
+  max_vertical_velocity: f64,
+}
+
+// Assume we were told which key and value to update over the network or some
+// other dynamic source
+let key = "motion_parameters.max_vertical_velocity";
+let value = Value::Double(40.0);
+
+cfg.set(key, value)?;
+assert_eq!(cfg.motion_parameters.max_vertical_velocity, 40.0);
+```
 
 ## Features
 
