@@ -97,11 +97,9 @@ pub enum UpdateError {
 
 /// A dynamically typed value.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(not(feature = "std"), derive(Copy))]
 pub enum Value {
     Integer(i64),
     Double(f64),
-    // FIXME: Not sure if this is a good idea...
     #[cfg(feature = "std")]
     String(String),
     #[doc(hidden)]
