@@ -147,10 +147,7 @@ impl<'a> From<&'a str> for Value {
 }
 
 macro_rules! impl_primitive_type {
-    ($type:ty, $variant:ident, $data_type:expr) => {
-        impl_primitive_type!(; $type, $variant, $data_type);
-    };
-    ($(#[$attr:meta])*; $type:ty, $variant:ident, $data_type:expr) => {
+    ($(#[$attr:meta])* $type:ty, $variant:ident, $data_type:expr) => {
         $(#[$attr])*
         impl StringlyTyped for $type {
             fn set_value<K, S>(&mut self, keys: K, value: Value) -> Result<(), UpdateError>
@@ -202,7 +199,7 @@ macro_rules! impl_primitive_type {
 
 impl_primitive_type!(i64, Integer, INTEGER_TYPE);
 impl_primitive_type!(f64, Double, DOUBLE_TYPE);
-impl_primitive_type!(String, String, STRING_TYPE);
+impl_primitive_type!(#[cfg(feature = "std")] String, String, STRING_TYPE);
 
 #[cfg(test)]
 mod tests {

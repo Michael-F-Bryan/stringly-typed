@@ -3,11 +3,10 @@ rust:
   - stable
 cache: cargo
 
-matrix:
-  include:
-    - env: FEATURES=--no-default-features
-    - env: FEATURES=
+env:
+  - FEATURES=std
+  - FEATURES=
 
 script:
-  - cargo build --all --verbose $FEATURES
-  - cargo test --all --verbose $FEATURES
+  - cargo build --all --verbose --no-default-features $FEATURES
+  - cargo test --all --verbose --no-default-features $FEATURES
