@@ -1,6 +1,6 @@
 [package]
 name = "stringly_typed"
-version = "0.1.0"
+version = "0.1.1-alpha.0"
 authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
 repository = "https://github.com/Michael-F-Bryan/stringly-typed"
 description = "A crate for updating values and indexing into Rust types at runtime"
